@@ -34,6 +34,12 @@
 
 **Description:** ...
 
+**Title:** [Google Zero Touch Network](https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/45687.pdf)
+
+**Organization**: Google
+
+**Description:** From first glance, this seems to be a full system that implements MALT - would be worth looking more into this.
+
 ---
 
 ## Code repos
