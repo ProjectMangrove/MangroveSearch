@@ -36,4 +36,13 @@
 
 ---
 
+## Code repos
+
+**Title:** [Example MALT schema](https://github.com/google/malt-example-models/blob/main/malt-example-final.textproto)
+
+**Organization:** Google
+
+**Description:** Example schema for a MALT model as described in the MALT google paper
+
+
 
