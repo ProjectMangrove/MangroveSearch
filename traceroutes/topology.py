@@ -22,4 +22,5 @@ def print_traceroutes(filename, lines):
             print("Hops:", record.hops, end='\n\n')
             ctr += 1
 
-print_traceroutes('amsterdam-traces.warts', 5)
+if __name__ == "__main__":
+    print_traceroutes('amsterdam-traces.warts', 5)
