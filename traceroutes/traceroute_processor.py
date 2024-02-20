@@ -4,10 +4,11 @@ class Traceroute_Processor():
 	Processes Traceroutes.
 	'''
 	def Traceroute_Processor(self):
+		self.adjacency_list = None
 		pass
 
 
-	def process_traceroutes(traceroutes):
+	def process_traceroutes(self, traceroutes):
 		'''
 		Processes traceroutes into an adjacency list format.
 
@@ -21,7 +22,7 @@ class Traceroute_Processor():
 			adjacency_list: dict{list[string]}
 				an adjacency list with the the nodes in the traceroute and the neighbors of each node
 		'''
-		adjacency_list = {}
+		self.adjacency_list = {}
 		for traceroute in traceroutes:
 			last = None
 			for ips in traceroute:
@@ -31,9 +32,19 @@ class Traceroute_Processor():
 				if last:
 					for last_ip in last:
 						for ip in ips:
-							adjacency_list[last_ip].append(ip)
+							self.adjacency_list[last_ip].append(ip)
 				for ip in ips:
-					if ip not in adjacency_list:
-						adjacency_list[ip] = []
+					if ip not in self.adjacency_list:
+						self.adjacency_list[ip] = []
 
-		return adjacency_list
+		return self.adjacency_list
+
+	def get_adjacency_list(self):
+		'''
+		Returns the adjacency list.
+
+		### Returns
+			adjacency_list: dict{list[string]}
+				an adjacency list with the the nodes in the traceroute and the neighbors of each node
+		'''
+		return self.adjacency_list
