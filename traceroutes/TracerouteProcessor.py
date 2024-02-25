@@ -1,4 +1,5 @@
-
+import json
+from utils import pickle_list, unpickle_list
 class TracerouteProcessor():
 	'''
 	Processes Traceroutes.
@@ -18,9 +19,22 @@ class TracerouteProcessor():
 	'''
 	adjacency_list = {}
 
-	def TracerouteProcessor(self):
+	def __init__(self, picklefile=None):
+		'''
+		Prcesses Traceroutes.
+
+		### Parameters
+			1. (optional) picklefile: string
+				The file to unpickle the adjaceny_list from if testing.
+
+		### Returns
+			None
+		'''
 		self.adjacency_list = {}
-		pass
+		if picklefile:
+			self.adjacency_list = unpickle_list(picklefile)
+			for ip in self.adjacency_list:
+				self.adjacency_list[ip] = set(self.adjacency_list[ip])
 
 	def process_traceroutes(self, traceroutes):
 		'''
@@ -40,6 +54,8 @@ class TracerouteProcessor():
 		for traceroute in traceroutes:
 			self.__process_traceroute(traceroute=traceroute)
 
+		pickle_list(self.adjacency_list, "adjlist.pk")
+
 	def __process_traceroute(self, traceroute):
 		'''
 		Processes traceroutes into the adjacency list format.
@@ -49,6 +65,9 @@ class TracerouteProcessor():
 				one singular traceroute. each list in the traceroute representing a hop in the traceroute
 				ie: [[IP1] -> [IP2a, IP2b] -> [IP3]]
 				each ip should be in a string. missing hops should be represented as ["*"]
+
+		### Returns
+			None
 		'''
 		last = None
 		for ips in traceroute:
@@ -69,10 +88,28 @@ class TracerouteProcessor():
 		Returns the adjacency list.
 
 		### Returns
-			adjacency_list: dict{list[string]}
+			adjacency_list: dict{set[string]}
 				an adjacency list with the the nodes in the traceroute and the neighbors of each node
 		'''
 		return self.adjacency_list
+
+	def dump_adjacency_list(self, filename):
+		'''
+		Dumps the adjacency list into the json file.
+
+		### Parameters
+			1. filename: string
+				The filename to dump into. Should be a json.
+
+		### Returns
+			None
+		'''
+		adj_list = {}
+		for ip in self.adjacency_list:
+			adj_list[ip] = list(self.adjacency_list[ip])
+
+		with open(filename, 'w') as f:
+			json.dump(adj_list, f)
 
 	def destroy_adjacency_list(self):
 		'''
