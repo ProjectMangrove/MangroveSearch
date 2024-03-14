@@ -40,7 +40,7 @@ class TopologyGenerator:
     Constructor
     '''
     def __init__(self, num_components, num_nodes):
-        random.seed(1)
+        random.seed(5)
         # VALUES
         self.num_components = num_components
         self.num_nodes = num_nodes
@@ -49,9 +49,8 @@ class TopologyGenerator:
         # Topology graph
         self.g = defaultdict(list)
 
-        # "BGP" nodes for each graph and the routing table for each of them
+        # "BGP" nodes for each graph
         self.exits = []
-        self.routing_table = defaultdict(list)
 
 
     def generate_topology(self):
@@ -60,6 +59,7 @@ class TopologyGenerator:
             self.generate_component(i*self.num_nodes, (i+1)*self.num_nodes)
 
             if not self.check_component(i*self.num_nodes, (i+1)*self.num_nodes):
+                print("FAILED")
                 return
         
 
@@ -68,7 +68,7 @@ class TopologyGenerator:
         for exit in self.exits:
             self.connect_components(exit, available_nodes)
 
-        pprint(self.g)
+        # pprint(self.g)
 
     def generate_component(self, first, last):
         # Pick the first n/4 nodes to be exit nodes
@@ -109,7 +109,7 @@ class TopologyGenerator:
             if exit_count == 0:
                 break
 
-    # Checks to see if you can get to any other part of the component from within the component
+    # Checks to see if component is strongly connected
     def check_component(self, start, end):
         nodes = [i for i in range(start, end)]
 
@@ -119,6 +119,8 @@ class TopologyGenerator:
             if res != self.num_nodes:
                 print("FAILED ON NODE", node, "with reachable", res)
                 return False
+        
+        return True
     
     def bfs(self, n):
         res = 1
@@ -139,11 +141,51 @@ class TopologyGenerator:
         
         return res
 
-    def generate_routing_tables(self):
-        for exit in self.exits:
-            pass
+    # USE BFS TO GENERATE PATHS from this node to all other nodes in the graph
+    def generate_as_path(self, source, dest):
+        # Find the path
+        path = self.find_path(source, dest)
+        
+        if not path:
+            return []
+    
+        as_path = []
+
+        for i in range(1, len(path)):
+            curr_component = path[i] // self.num_nodes
+            last_component =  path[i - 1] // self.num_nodes
+
+            if curr_component != last_component:
+                as_path.append((path[i - 1], last_component))
+                as_path.append((path[i], curr_component))
+        
+        return as_path
+
     def find_path(self, source, dest):
-        pass
+        visited = set()
+        q = deque()
+
+        q.append([source])
+        visited.add(source)
+
+        while q:
+            all_elements = len(q)
+
+            for i in range(all_elements):
+                curr_path = q.popleft()
+                curr_node = curr_path[-1]
+
+                for neighbor in self.g[curr_node]:
+                    if neighbor == dest:
+                        curr_path.append(dest)
+                        return curr_path
+                    elif neighbor not in visited:
+                        new_path = curr_path.copy()
+                        new_path.append(neighbor)
+                        q.append(new_path)
+                        visited.add(neighbor)
+        
+        return []
 
     def generate_paths(self, n):
         pass
@@ -151,3 +193,8 @@ class TopologyGenerator:
 if __name__ == "__main__":
     topo = TopologyGenerator(6, 12)
     topo.generate_topology()
+
+    res = topo.find_path(10, 44)
+    as_res = topo.generate_as_path(10, 44)
+    print(res)
+    print(as_res)
