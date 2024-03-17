@@ -278,6 +278,11 @@ if __name__ == "__main__":
     print(partial_graph[71])
     print(partial_graph_reverse[611])
 
+'''
+    On each edge store a bloom filter hashes end AS's that have used this path (can also use a BDD or anything else space efficient)
+    To reconstruct the middle AS path, idneitfy start and end pieces, and use edges that correspond with end AS to construct "set" of paths
+'''
+
 
     
     
