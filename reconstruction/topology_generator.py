@@ -60,25 +60,33 @@ class TopologyGenerator:
 
             if not self.check_component(i*self.num_nodes, (i+1)*self.num_nodes):
                 print("FAILED")
-                return
+                return False
         
 
         available_nodes = [i for i in range(0, self.total_nodes)]
         
         for exit in self.exits:
             self.connect_components(exit, available_nodes)
-
+        
+        return True
         # pprint(self.g)
 
     def generate_component(self, first, last):
         # Pick the first n/4 nodes to be exit nodes
         nodes = [i for i in range(first, last)]
-        exits = nodes[:self.num_nodes // 4]
-        others = nodes[self.num_nodes // 4:]
+        exits = nodes[:self.num_nodes // 6]
+        others = nodes[self.num_nodes // 6:]
+
+        # PICK A SUPER EXIT
+        self.g[exits[0]].extend(nodes[1:])
         
-        # Add exits first
-        for exit in exits:
-            for node in nodes:
+        # Add all other exits first
+        for i in range(1, len(exits)):
+            exit = exits[i]
+            random.shuffle(nodes)
+            connections = nodes[:self.num_nodes // 2]
+            
+            for node in connections:
                 if node != exit:
                     self.g[exit].append(node)
 
@@ -86,14 +94,14 @@ class TopologyGenerator:
         for other in others:
             random.shuffle(nodes)
 
-            self.g[other].extend(nodes[:self.num_nodes // 3])
+            self.g[other].extend(nodes[:3])
         
         # Add all exits to the exit list
         self.exits.extend(exits)
 
     def connect_components(self, exit, available_nodes):
         random.shuffle(available_nodes)
-        exit_count = 2
+        exit_count = 1
 
         for i in range(len(available_nodes)):
             exit_component = exit // self.num_nodes
@@ -102,7 +110,7 @@ class TopologyGenerator:
             # If the current node is not the exit AND it is in a different connected component
             if available_nodes[i] != exit and exit_component != node_component:
                 self.g[exit].append(available_nodes[i])
-                self.g[available_nodes[i]].append(exit)
+                #self.g[available_nodes[i]].append(exit)
                 available_nodes.remove(available_nodes[i])
                 exit_count -= 1
 
@@ -188,13 +196,95 @@ class TopologyGenerator:
         return []
 
     def generate_paths(self, n):
+        generated = {}
+
+        for i in range(n):
+            rand_source, rand_dest = 0, 0
+            
+            while rand_source == rand_dest:
+                rand_source, rand_dest = random.randrange(0, self.total_nodes), random.randrange(0, self.total_nodes)
+            
+            if (rand_source, rand_dest) not in generated:
+                generated[rand_source, rand_dest] = self.find_path(rand_source, rand_dest)
+        
+        return generated
+
+class PartialTopology:
+    
+    def __init__(self, traceroutes):
+        self.g = defaultdict(list)
+        self.rev_g = defaultdict(list)
+        self.generate_topology(traceroutes)
+    
+    def generate_topology(self, traceroutes):
+        for traceroute in traceroutes:
+            for i in range(1, len(traceroute)):
+                self.g[traceroute[i - 1]].append(traceroute[i])
+                self.rev_g[traceroute[i]].append(traceroute[i - 1])
+
+    
+    def get_topology(self):
+        return self.g
+    
+    def get_reverse_topology(self):
+        return self.rev_g
+    
+    def get_path(self, Topology, src, dest):
+        # Get the AS pathing
+
+        # Pick the first AS, check
+
         pass
-
+                
+        
 if __name__ == "__main__":
-    topo = TopologyGenerator(6, 12)
-    topo.generate_topology()
+    topo = TopologyGenerator(20, 48)
+    res = topo.generate_topology()
 
-    res = topo.find_path(10, 44)
-    as_res = topo.generate_as_path(10, 44)
-    print(res)
-    print(as_res)
+    if not res:
+        print("FAILED TO GENERATE TOPOLOGY")
+    
+    traceroutes = topo.generate_paths(800)
+    traceroutes[(83, 579)] = topo.find_path(83, 579)
+
+    partial_topo = PartialTopology(traceroutes)
+    partial_graph = partial_topo.get_topology()
+    partial_graph_reverse = partial_topo.get_reverse_topology()
+
+    # Pick a random pairing (107, 5)
+    """ longest = -1
+    longest_pair = ()
+    for src in range(48):
+        for i in range(49, 20*48):
+            path = topo.find_path(src, i)
+
+            if len(path) > longest:
+                longest = len(path)
+                longest_pair = (src, i)
+    
+    print(longest)
+    print(longest_pair) """
+    
+    #src, dest = 22, 435
+    src, dest = 71, 611
+    print("THE PAIR IS:", src, dest)
+    print(topo.generate_as_path(src, dest))
+    print(topo.find_path(src, dest))
+
+    if (src, dest) in traceroutes:
+        print("TRACEROUTE ALREADY EXISTS")
+        print(traceroutes[(src, dest)])
+    
+    print(partial_graph[71])
+    print(partial_graph_reverse[611])
+
+
+    
+    
+
+
+
+
+
+
+    
