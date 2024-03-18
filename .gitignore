@@ -1,2 +1,7 @@
 *.warts
 *.warts.gz
+*.pk
+*.json
+*.txt
+
+**/__pycache__/*
