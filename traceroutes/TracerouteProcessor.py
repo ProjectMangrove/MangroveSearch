@@ -36,7 +36,7 @@ class TracerouteProcessor():
 			for ip in self.adjacency_list:
 				self.adjacency_list[ip] = set(self.adjacency_list[ip])
 
-	def process_traceroutes(self, traceroutes):
+	def process_traceroutes(self, traceroutes, source):
 		'''
 		Processes a list of traceroutes into the adjacency list.
 
@@ -51,10 +51,33 @@ class TracerouteProcessor():
 		### Returns
 			None
 		'''
-		for traceroute in traceroutes:
-			self.__process_traceroute(traceroute=traceroute)
+		if source == 'caida':
+			for traceroute in traceroutes:
+				self.__process_traceroute(traceroute=traceroute)
+		elif source == 'ripe':
+			self.__process_ripe(traceroutes=traceroutes)
+		else:
+			pass
 
 		pickle_list(self.adjacency_list, "adjlist.pk")
+
+	def __process_ripe(self, traceroutes):
+		'''
+		Source built from: https://web.eecs.umich.edu/~harshavm/iplane/
+		'''
+		for line in traceroutes:
+			src = line[0]
+			dest = line[1]
+
+			if src not in self.adjacency_list:
+				self.adjacency_list[src] = set()
+
+			self.adjacency_list[src].add(dest)
+
+			if dest not in self.adjacency_list:
+				self.adjacency_list[dest] = set()
+
+			self.adjacency_list[dest].add(src)
 
 	def __process_traceroute(self, traceroute):
 		'''
