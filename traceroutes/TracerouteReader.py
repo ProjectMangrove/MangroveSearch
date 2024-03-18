@@ -126,7 +126,9 @@ if __name__ == "__main__":
     print(traceroute_list[:5])
 
     tp = TracerouteProcessor()
-    tp.process_traceroutes(traceroutes=traceroute_list)
+    tp.process_traceroutes(traceroutes=traceroute_list, source='caida')
+    with open('curr_inter_ip_links.txt', 'r') as f:
+        tp.process_traceroutes(traceroutes=f.readlines(), source='ripe')
     tp.dump_adjacency_list('adjlist.json')
 
     # if you've already ran the above and you're just doing some testing, you can run:
