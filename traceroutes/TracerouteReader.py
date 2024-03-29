@@ -118,18 +118,32 @@ class TracerouteReader:
             print("Number of hops:", len(record.hops))
             print(record.hops)
 
+    def print_to_file(self, filename):
+        with open(filename, 'w+') as f:
+            for idx, traceroute in enumerate(self.traceroute_list):
+                line = ""
+                for hop in traceroute:
+                    curr_hop = ",".join(hop)
+                    line += curr_hop + " "
+                line = line[:-1]
+                line += "\n"
+                f.write(line)
+
+                if idx % 1000 == 0:
+                    print(str(idx) + "lines saved")
+
 if __name__ == "__main__":
     # this is a complete run
-    tr = TracerouteReader("amsterdam.warts")
-    tr.generate_traceroute_list()
-    traceroute_list = tr.get_traceroute_list()
-    print(traceroute_list[:5])
+    # tr = TracerouteReader("amsterdam.warts")
+    # tr.generate_traceroute_list()
+    # traceroute_list = tr.get_traceroute_list()
+    # print(traceroute_list[:5])
 
-    tp = TracerouteProcessor()
-    tp.process_traceroutes(traceroutes=traceroute_list, source='caida')
-    with open('curr_inter_ip_links.txt', 'r') as f:
-        tp.process_traceroutes(traceroutes=f.readlines(), source='ripe')
-    tp.dump_adjacency_list('adjlist.json')
+    # tp = TracerouteProcessor()
+    # tp.process_traceroutes(traceroutes=traceroute_list, source='caida')
+    # with open('curr_inter_ip_links.txt', 'r') as f:
+    #     tp.process_traceroutes(traceroutes=f.readlines(), source='ripe')
+    # tp.dump_adjacency_list('adjlist.json')
 
     # if you've already ran the above and you're just doing some testing, you can run:
     # tr = TracerouteReader("amsterdam.warts", 'trlist.pk')
@@ -139,3 +153,5 @@ if __name__ == "__main__":
 
     # before using remember to pip3 install scamper-pywarts
     # https://github.com/drakkar-lig/scamper-pywarts
+    tr = TracerouteReader("amsterdam.warts", 'trlist.pk')
+    tr.print_to_file("traceroutes.txt")

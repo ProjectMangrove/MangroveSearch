@@ -13,7 +13,7 @@ def pickle_list(to_pickle, filename):
         ### Returns
             None
         '''
-        with open(filename, 'wb') as f:
+        with open("pickles/"+filename, 'wb') as f:
             pickle.dump(to_pickle, f)
 
 def unpickle_list(filename):
@@ -29,6 +29,6 @@ def unpickle_list(filename):
             the unpickled object
     '''
     if filename:
-        with open(filename, 'rb') as f:
+        with open("pickles/"+filename, 'rb') as f:
             l = pickle.load(f)
     return l

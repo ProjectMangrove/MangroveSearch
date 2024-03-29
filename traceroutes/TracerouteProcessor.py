@@ -74,10 +74,10 @@ class TracerouteProcessor():
 
 			self.adjacency_list[src].add(dest)
 
-			if dest not in self.adjacency_list:
-				self.adjacency_list[dest] = set()
+			# if dest not in self.adjacency_list:
+			# 	self.adjacency_list[dest] = set()
 
-			self.adjacency_list[dest].add(src)
+			# self.adjacency_list[dest].add(src)
 
 	def __process_traceroute(self, traceroute):
 		'''
