@@ -2,6 +2,15 @@ import os
 import glob
 
 class TracerouteConverter():
+    '''
+    ruleDicts is a dictionary in the following format:
+
+    {ip:ip_dict}
+    each ip corresponds to one fib
+
+    ip_dict is {ip_dest:next_hop}
+    each line in the fib is fw ip_dest 32 next_hop
+    '''
     def __init__(self, filename):
         self.filename = filename
         self.ruleDicts = {}
@@ -36,6 +45,9 @@ class TracerouteConverter():
         self.ruleDicts = ruleDicts
 
     def writeFibs(self):
+        '''
+        Writes the rule dict dictionary to fibs
+        '''
         files = glob.glob("generated_fibs/*")
         for f in files:
             os.remove(f)
