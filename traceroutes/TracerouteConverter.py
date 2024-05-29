@@ -78,6 +78,6 @@ class TracerouteConverter():
         '''
 
 if __name__ == "__main__":
-    tc = TracerouteConverter("data/traceroutes.txt")
+    tc = TracerouteConverter("data/testtraceroutes.txt")
     tc.convertTraceroutes()
     tc.writeFibs()
